@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "stack.h"
 
@@ -29,7 +30,9 @@ StackStatusCode stack_push(Stack* stack, void* data, size_t nmeb) {
     }
 
     node->nmeb = nmeb;
-    node->data = data;
+    node->data = malloc(nmeb);
+    memcpy(node->data, data, nmeb);
+
     node->prev = stack->top;
     stack->top = node;
     stack->size++;
@@ -68,6 +71,7 @@ StackStatusCode stack_pop(Stack* stack, void** data, size_t* nmeb) {
     stack->top = removed->prev;
     stack->size--;
 
+    free(removed->data);
     free(removed);
     return SUCCESS;
 }
