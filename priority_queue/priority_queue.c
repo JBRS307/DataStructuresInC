@@ -34,10 +34,10 @@ static void heapify(void* array, size_t i, size_t size, size_t nmeb, int (*compa
     r = right(i);
     min_ind = i;
 
-    if (l < size && compar(array+offset(l, nmeb), array+offset(min_ind, nmeb)) < 0) {
+    if ((l < size) && (compar(array+offset(l, nmeb), array+offset(min_ind, nmeb)) < 0)) {
         min_ind = l;
     }
-    if (r < size && compar(array+offset(r, nmeb), array+offset(min_ind, nmeb)) < 0) {
+    if ((r < size) && (compar(array+offset(r, nmeb), array+offset(min_ind, nmeb)) < 0)) {
         min_ind = r;
     }
 
@@ -61,9 +61,10 @@ static void move_up(void* array, size_t i, size_t nmeb, int (*compar)(const void
 }
 
 static void build_heap(void* array, size_t size, size_t nmeb, int (*compar)(const void*, const void*)) {
-    for (size_t i = parent(size-1); i >= 0; i--) {
+    for (size_t i = parent(size-1); i > 0; i--) {
         heapify(array, i, size, nmeb, compar);
     }
+    heapify(array, 0, size, nmeb, compar);
 }
 
 // end of static functions
@@ -128,6 +129,7 @@ PriorityQueueStatusCode pq_put(PriorityQueue* pq, const void* data) {
 
     if (pq->size == pq->capacity) {
         pq->array = realloc(pq->array, 2*(pq->capacity)*(pq->nmeb));
+        pq->capacity *= 2;
     }
 
     size_t index = pq->size;
