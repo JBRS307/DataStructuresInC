@@ -47,6 +47,19 @@ static void heapify(void* array, size_t i, size_t size, size_t nmeb, comparator 
     }
 }
 
+static void move_up(void* array, size_t i, size_t nmeb, comparator f) {
+    if (i == 0) {
+        return;
+    }
+
+    size_t p = parent(i);
+
+    if (f(array+offset(i, nmeb), array+offset(p, nmeb)) < 0) {
+        swap(array+offset(i, nmeb), array+offset(p, nmeb), nmeb);
+        move_up(array, p, nmeb, f);
+    }
+}
+
 static void build_heap(void* array, size_t size, size_t nmeb, comparator f) {
     for (size_t i = parent(size-1); i >= 0; i--) {
         heapify(array, i, size, nmeb, f);
@@ -58,15 +71,16 @@ static void build_heap(void* array, size_t size, size_t nmeb, comparator f) {
 PriorityQueue pq_init(void* array, comparator f, size_t nmeb, size_t size) {
     PriorityQueue pq;
     if (array != NULL) {
-        build_heap(array, size, nmeb, f);
-        pq.array = array;
+        pq.array = malloc(size*nmeb);
+        memcpy(pq.array, array, size*nmeb);
         pq.size = size;
         pq.capacity = size;
         pq.nmeb = nmeb;
+        build_heap(pq.array, size, nmeb, f);
     } else {
-        pq.array = NULL;
+        pq.array = malloc(nmeb);
         pq.size = 0;
-        pq.capacity = 0;
+        pq.capacity = 1;
         pq.nmeb = nmeb;
     }
     return pq;
@@ -79,16 +93,66 @@ PriorityQueue* pq_init_dynamic(void* array, comparator f, size_t nmeb, size_t si
     }
 
     if (array != NULL) {
-        build_heap(array, size, nmeb, f);
-        pq->array = array;
+        pq->array = malloc(size*nmeb);
+        memcpy(pq->array, array, size*nmeb);
         pq->size = size;
         pq->capacity = size;
         pq->nmeb = nmeb;
+        build_heap(pq->array, size, nmeb, f);
     } else {
-        pq->array = NULL;
+        pq->array = malloc(nmeb);
         pq->size = 0;
-        pq->capacity = 0;
+        pq->capacity = 1;
         pq->nmeb = nmeb;
     }
     return pq;
+}
+
+PriorityQueueStatusCode pq_peek(const PriorityQueue* pq, void* data) {
+    if (data == NULL) {
+        return NULL_DATA_ERROR;
+    }
+
+    if (pq->size == 0) {
+        return PRIORITY_QUEUE_EMPTY_ERROR;
+    }
+
+    memcpy(data, pq->array, pq->nmeb);
+    return SUCCESS;
+}
+
+PriorityQueueStatusCode pq_put(PriorityQueue* pq, const void* data) {
+    if (data == NULL) {
+        return NULL_DATA_ERROR;
+    }
+
+    if (pq->size == pq->capacity) {
+        pq->array = realloc(pq->array, 2*(pq->capacity)*(pq->nmeb));
+    }
+
+    size_t index = pq->size;
+    memcpy(pq->array+offset(index, pq->nmeb), data, pq->nmeb);
+
+    move_up(pq->array, index, pq->nmeb, pq->f);
+    pq->size++;
+    return SUCCESS;
+}
+
+PriorityQueueStatusCode pq_pop(PriorityQueue* pq, void* data) {
+    if (data == NULL) {
+        return NULL_DATA_ERROR;
+    }
+
+    if (pq->size == 0) {
+        return PRIORITY_QUEUE_EMPTY_ERROR;
+    }
+
+    memcpy(data, pq->array, pq->nmeb);
+
+    swap(pq->array, pq->array+offset(pq->size - 1, pq->nmeb), pq->nmeb);
+    pq->size--;
+
+    heapify(pq->array, 0, pq->size, pq->nmeb, pq->f);
+
+    return SUCCESS;
 }
