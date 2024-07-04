@@ -58,13 +58,15 @@ QueueStatusCode queue_push(Queue* q, void* data, size_t nmeb) {
 
     memcpy(node->data, data, nmeb);
     node->nmeb = nmeb;
+    node->next = NULL;
 
     node->prev = q->tail;
-    node->next = NULL;
-    q->tail = node;
-    if (queue_is_empty(q)) {
+    if (!queue_is_empty(q)) {
+        q->tail->next = node;
+    } else {
         q->head = node;
     }
+    q->tail = node;
     q->size++;
 
     return SUCCESS;
