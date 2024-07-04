@@ -109,6 +109,10 @@ PriorityQueue* pq_init_dynamic(void* array, int (*compar)(const void*, const voi
     return pq;
 }
 
+void pq_drop(PriorityQueue* pq) {
+    free(pq->array);
+}
+
 PriorityQueueStatusCode pq_peek(const PriorityQueue* pq, void* data) {
     if (data == NULL) {
         return NULL_DATA_ERROR;

@@ -22,7 +22,12 @@ typedef struct priority_queue {
 // Array is copied into priority queue
 PriorityQueue pq_init(void* array, int (*compar)(const void*, const void*), size_t nmeb, size_t size);
 
+// Initializes queue dynamically on a heap
 PriorityQueue* pq_init_dynamic(void* array, int (*compar)(const void*, const void*), size_t nmeb, size_t size);
+
+// clears the priority queue, is allocated dynamically, pointer
+// should be freed manually afterwards
+void pq_drop(PriorityQueue* pq);
 
 // Peeks the top element from the priority queue, copies it into data
 PriorityQueueStatusCode pq_peek(const PriorityQueue* pq, void* data);
