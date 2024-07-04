@@ -7,7 +7,7 @@ typedef enum stack_status_code {
     SUCCESS,
     STACK_EMPTY,
     ALLOCATION_ERROR,
-    NULL_ELEM_ERROR,
+    NULL_DATA_ERROR,
 } StackStatusCode;
 
 // elements on stack can be allocated both statically and dynamically

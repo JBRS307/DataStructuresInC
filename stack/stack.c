@@ -21,7 +21,7 @@ size_t stack_size(const Stack* stack) {
 
 StackStatusCode stack_push(Stack* stack, void* data, size_t nmeb) {
     if (data == NULL) {
-        return NULL_ELEM_ERROR;
+        return NULL_DATA_ERROR;
     }
 
     StackNode* node = (StackNode*)malloc(sizeof(StackNode));
@@ -40,13 +40,15 @@ StackStatusCode stack_push(Stack* stack, void* data, size_t nmeb) {
 }
 
 StackStatusCode stack_peek(const Stack* stack, void** data, size_t* nmeb) {
+    if (data == NULL) {
+        return NULL_DATA_ERROR;
+    }
+
     if (stack->size == 0) {
         return STACK_EMPTY;
     }
 
-    if (data != NULL) {
-        *data = stack->top->data;
-    }
+    *data = stack->top->data;
     if (nmeb != NULL) {
         *nmeb = stack->top->nmeb;
     }
@@ -56,7 +58,7 @@ StackStatusCode stack_peek(const Stack* stack, void** data, size_t* nmeb) {
 
 StackStatusCode stack_pop(Stack* stack, void** data, size_t* nmeb) {
     if (data == NULL) {
-        return NULL_ELEM_ERROR; // to prevent potential memory leaks
+        return NULL_DATA_ERROR; // to prevent potential memory leaks
     }
     if (stack->size == 0) {
         return STACK_EMPTY;
@@ -71,7 +73,6 @@ StackStatusCode stack_pop(Stack* stack, void** data, size_t* nmeb) {
     stack->top = removed->prev;
     stack->size--;
 
-    free(removed->data);
     free(removed);
     return SUCCESS;
 }
