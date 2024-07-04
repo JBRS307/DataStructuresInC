@@ -26,6 +26,9 @@ typedef struct stack {
 // initializes stack
 Stack stack_init();
 
+// Initializes stack dynamically on a heap
+Stack* stack_init_dynamic();
+
 // check if stack is empty
 bool stack_is_empty(const Stack* stack);
 

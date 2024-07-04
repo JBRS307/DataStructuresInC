@@ -11,6 +11,13 @@ Stack stack_init() {
     return new_stack;
 }
 
+Stack* stack_init_dynamic() {
+    Stack* stack = (Stack*)malloc(sizeof(Stack));
+    stack->top = NULL;
+    stack->size = 0;
+    return stack;
+}
+
 bool stack_is_empty(const Stack* stack) {
     return stack->size == 0;
 }
